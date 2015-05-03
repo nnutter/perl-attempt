@@ -1,11 +1,36 @@
 package Attempt;
+
 use 5.008001;
 use strict;
 use warnings;
 
+use Carp qw(croak);
+use Exporter qw(import);
+
+our @EXPORT_OK = qw(attempt def);
 our $VERSION = "0.01";
 
+sub attempt(&) {
+    my $code = shift;
+    my @results;
+    my $error = do {
+        local $@;
+        @results = eval { $code->() };
+        $@;
+    };
+    if ($error eq '') {
+        undef $error;
+    }
+    return ($error, @results);
+}
 
+sub def {
+    my @results = @_;
+    unless (@_) {
+        croak 'expected a defined result';
+    }
+    return @results;
+}
 
 1;
 __END__
